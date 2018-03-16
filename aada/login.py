@@ -102,26 +102,25 @@ class Login:
         page = pages[0]
         #page = await browser.newPage()
 
-        # async def _saml_response(req):
-        #     if req.url == 'https://signin.aws.amazon.com/saml':
-        #         self.saml_response = parse_qs(req.postData)['SAMLResponse'][0]
-        #     else:
-        #         await req.continue_()
-        #
-        # page.on('request', _saml_response)
-        # await page.setRequestInterception(True)
+        async def _saml_response(req):
+            if req.url == 'https://signin.aws.amazon.com/saml':
+                self.saml_response = parse_qs(req.postData)['SAMLResponse'][0]
+            else:
+                await req.continue_()
+
+        page.on('request', _saml_response)
+        await page.setRequestInterception(True)
         await asyncio.sleep(self._SLEEP_TIMEOUT)
         await page.goto(url, waitUntil='networkidle0')
         await asyncio.sleep(self._SLEEP_TIMEOUT)
         await page.waitForSelector('input[name="loginfmt"]:not(.moveOffScreen)')
         await page.focus('input[name="loginfmt"]')
-        for l in username:
-            await page.keyboard.sendCharacter(l)
+        await page.keyboard.type(username)
         await page.click('input[type=submit]')
+        await asyncio.sleep(self._SLEEP_TIMEOUT)
         await page.waitForSelector('input[name="passwd"]:not(.moveOffScreen)')
         await page.focus('input[name="passwd"]')
-        for l in password:
-            await page.keyboard.sendCharacter(l)
+        await page.keyboard.type(password)
         await page.click('input[type=submit]')
 
         try:
