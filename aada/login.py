@@ -42,7 +42,7 @@ class Login:
                     'aws_session_token']
     _MFA_DELAY = 3
     _AWAIT_TIMEOUT = 90000
-    _SLEEP_TIMEOUT = 1  # in seconds
+    _SLEEP_TIMEOUT = 2  # in seconds
     _EXEC_PATH = os.environ.get('CHROME_EXECUTABLE_PATH')
 
     def __init__(self, session, role=None, account=None, saml_request=None):
@@ -114,7 +114,6 @@ class Login:
                 await req.respond({
                     'status': 200, 'contentType': 'text/plain', 'body': ''
                 })
-                await browser.close()
             else:
                 await req.continue_()
 
@@ -125,8 +124,7 @@ class Login:
         await page.focus('input[name="loginfmt"]')
         await page.keyboard.type(username)
         await page.click('input[type=submit]')
-        await asyncio.sleep(2)
-        print(password)
+        await asyncio.sleep(self._SLEEP_TIMEOUT)
         await page.waitForSelector('input[name="passwd"]:not(.moveOffScreen)')
         await page.focus('input[name="passwd"]')
         await page.keyboard.type(password)
