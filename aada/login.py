@@ -110,7 +110,8 @@ class Login:
 
         page.on('request', _saml_response)
         await page.setRequestInterception(True)
-        await page.goto(url) #, waitUntil='networkidle0')
+        await asyncio.sleep(self._SLEEP_TIMEOUT)
+        await page.goto(url, waitUntil='networkidle0')
         await asyncio.sleep(self._SLEEP_TIMEOUT)
         await page.waitForSelector('input[name="loginfmt"]:not(.moveOffScreen)')
         await page.focus('input[name="loginfmt"]')
