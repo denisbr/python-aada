@@ -104,6 +104,9 @@ class Login:
 
         async def _saml_response(req):
             print(req.url)
+            if req.url.startswith('https://autologon.microsoftazuread-sso.com/tech-01.net/winauth/sso'):
+                pass
+
             if req.url == 'https://signin.aws.amazon.com/saml':
                 self.saml_response = parse_qs(req.postData)['SAMLResponse'][0]
                 await req.respond({
