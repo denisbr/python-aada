@@ -15,7 +15,7 @@ from awscli.customizations.configure.writer import ConfigFileWriter
 from pyppeteer.errors import BrowserError
 
 from . import LOGIN_URL, MFA_WAIT_METHODS
-from pyppeteer.launcher import launch
+from .launcher import launch
 
 
 class MfaException(Exception):
