@@ -103,6 +103,7 @@ class Login:
         #page = await browser.newPage()
 
         async def _saml_response(req):
+            print(req.url)
             if req.url == 'https://signin.aws.amazon.com/saml':
                 self.saml_response = parse_qs(req.postData)['SAMLResponse'][0]
             else:
