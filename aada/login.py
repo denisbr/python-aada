@@ -123,8 +123,8 @@ class Login:
         await asyncio.sleep(5)
         # await page.waitForSelector('input[name="passwd"]:not(.moveOffScreen)')
         # await page.focus('input[name="passwd"]')
-        await page.keyboard.type(password)
-        await page.click('input[type=submit]')
+        #await page.keyboard.type(password)
+        #await page.click('input[type=submit]')
 
         try:
             if mfa:
