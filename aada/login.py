@@ -95,8 +95,8 @@ class Login:
             saml_request=quote(saml_request))
 
     async def _render_js_form(self, url, username, password, mfa=None):
-        browser = await launch() # executablePath=self._EXEC_PATH,
-                               #args=['--no-sandbox', '--disable-setuid-sandbox'])
+        browser = await launch(executablePath=self._EXEC_PATH,
+                               args=['--no-sandbox', '--disable-setuid-sandbox'])
 
         pages = await browser.pages()
         page = pages[0]
