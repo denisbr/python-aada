@@ -42,7 +42,7 @@ class Login:
                     'aws_session_token']
     _MFA_DELAY = 3
     _AWAIT_TIMEOUT = 90000
-    _SLEEP_TIMEOUT = 2  # in seconds
+    _SLEEP_TIMEOUT = 1  # in seconds
     _EXEC_PATH = os.environ.get('CHROME_EXECUTABLE_PATH')
 
     def __init__(self, session, role=None, account=None, saml_request=None):
@@ -95,15 +95,13 @@ class Login:
             saml_request=quote(saml_request))
 
     async def _render_js_form(self, url, username, password, mfa=None):
-        browser = await launch(headless=False) # executablePath=self._EXEC_PATH,
+        browser = await launch() # executablePath=self._EXEC_PATH,
                                #args=['--no-sandbox', '--disable-setuid-sandbox'])
 
         pages = await browser.pages()
         page = pages[0]
-        #page = await browser.newPage()
 
         async def _saml_response(req):
-            print(req.url)
             if req.url.startswith('https://autologon.microsoftazuread-sso.com'):
                 await req.respond({
                     'status': 200, 'contentType': 'text/plain', 'body': ''
@@ -121,6 +119,7 @@ class Login:
         await page.setRequestInterception(True)
         await page.goto(url, waitUntil='networkidle0')
         await page.waitForSelector('input[name="loginfmt"]:not(.moveOffScreen)')
+        await asyncio.sleep(self._SLEEP_TIMEOUT)
         await page.focus('input[name="loginfmt"]')
         await page.keyboard.type(username)
         await page.click('input[type=submit]')
