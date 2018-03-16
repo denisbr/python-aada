@@ -104,7 +104,7 @@ class Login:
 
         async def _saml_response(req):
             print(req.url)
-            if req.url.startswith('https://autologon.microsoftazuread-sso.com/tech-01.net/winauth/sso'):
+            if req.url.startswith('https://autologon.microsoftazuread-sso.com'):
                 await req.respond({
                     'status': 200, 'contentType': 'text/plain', 'body': ''
                 })
@@ -124,12 +124,11 @@ class Login:
         await page.waitForSelector('input[name="loginfmt"]:not(.moveOffScreen)')
         await page.focus('input[name="loginfmt"]')
         await page.keyboard.type(username)
-        # await page.click('input[type=submit]')
-        # await asyncio.sleep(5)
-        # await page.waitForSelector('input[name="passwd"]:not(.moveOffScreen)')
-        # await page.focus('input[name="passwd"]')
-        #await page.keyboard.type(password)
-        #await page.click('input[type=submit]')
+        await page.click('input[type=submit]')
+        await page.waitForSelector('input[name="passwd"]:not(.moveOffScreen)')
+        await page.focus('input[name="passwd"]')
+        await page.keyboard.type(password)
+        await page.click('input[type=submit]')
 
         try:
             if mfa:
