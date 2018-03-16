@@ -125,6 +125,7 @@ class Login:
         await page.focus('input[name="loginfmt"]')
         await page.keyboard.type(username)
         await page.click('input[type=submit]')
+        await asyncio.sleep(self._SLEEP_TIMEOUT)
         await page.waitForSelector('input[name="passwd"]:not(.moveOffScreen)')
         await page.focus('input[name="passwd"]')
         await page.keyboard.type(password)
