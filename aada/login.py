@@ -106,21 +106,23 @@ class Login:
             print(req.url)
             if req.url == 'https://signin.aws.amazon.com/saml':
                 self.saml_response = parse_qs(req.postData)['SAMLResponse'][0]
+                await req.respond({
+                    'status': 200, 'contentType': 'text/plain', 'body': ''
+                })
+                await browser.close()
             else:
                 await req.continue_()
 
         page.on('request', _saml_response)
         await page.setRequestInterception(True)
-        await asyncio.sleep(self._SLEEP_TIMEOUT)
         await page.goto(url, waitUntil='networkidle0')
-        await asyncio.sleep(self._SLEEP_TIMEOUT)
         await page.waitForSelector('input[name="loginfmt"]:not(.moveOffScreen)')
         await page.focus('input[name="loginfmt"]')
         await page.keyboard.type(username)
         await page.click('input[type=submit]')
-        await asyncio.sleep(self._SLEEP_TIMEOUT)
-        await page.waitForSelector('input[name="passwd"]:not(.moveOffScreen)')
-        await page.focus('input[name="passwd"]')
+        await asyncio.sleep(5)
+        # await page.waitForSelector('input[name="passwd"]:not(.moveOffScreen)')
+        # await page.focus('input[name="passwd"]')
         await page.keyboard.type(password)
         await page.click('input[type=submit]')
 
