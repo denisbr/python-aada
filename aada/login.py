@@ -15,7 +15,7 @@ from awscli.customizations.configure.writer import ConfigFileWriter
 from pyppeteer.errors import BrowserError
 
 from . import LOGIN_URL, MFA_WAIT_METHODS
-from .launcher import launch
+from pyppeteer.launcher import launch
 
 
 class MfaException(Exception):
@@ -95,12 +95,12 @@ class Login:
             saml_request=quote(saml_request))
 
     async def _render_js_form(self, url, username, password, mfa=None):
-        browser = launch(executablePath=self._EXEC_PATH,
-                               args=['--no-sandbox', '--disable-setuid-sandbox'])
+        browser = await launch(headless=False) # executablePath=self._EXEC_PATH,
+                               #args=['--no-sandbox', '--disable-setuid-sandbox'])
 
-        #pages = await browser.pages()
-        #page = pages[0]
-        page = await browser.newPage()
+        pages = await browser.pages()
+        page = pages[0]
+        #page = await browser.newPage()
 
         async def _saml_response(req):
             if req.url == 'https://signin.aws.amazon.com/saml':
@@ -108,8 +108,8 @@ class Login:
             else:
                 await req.continue_()
 
-        #page.on('request', _saml_response)
-        #await page.setRequestInterception(True)
+        page.on('request', _saml_response)
+        await page.setRequestInterception(True)
         await page.goto(url) #, waitUntil='networkidle0')
         await asyncio.sleep(self._SLEEP_TIMEOUT)
         await page.waitForSelector('input[name="loginfmt"]:not(.moveOffScreen)')
@@ -125,11 +125,6 @@ class Login:
 
         try:
             if mfa:
-                await page.waitForSelector(
-                    'input[name="mfaLastPollStart"]',
-                    timeout=self._AWAIT_TIMEOUT
-                )
-
                 if self._azure_mfa not in MFA_WAIT_METHODS:
                     await page.waitForSelector('input[name="otc"]:not(.moveOffScreen)')
                     await page.focus('input[name="otc"]')
@@ -145,17 +140,10 @@ class Login:
                     'form[action="/kmsi"]', timeout=self._AWAIT_TIMEOUT)
                 await page.waitForSelector('#idBtn_Back')
                 await page.click('#idBtn_Back')
-            await page.waitForSelector('input[name="SAMLResponse"]')
         except BrowserError as e:
             print('Please try again, probably you entered a wrong password')
             print(e)
             exit(1)
-
-        await page.querySelector('input[name="SAMLResponse"]')
-        self.saml_response = await page.evaluate(
-            '() => document.getElementsByName("SAMLResponse")[0].value')
-
-        return {'SAMLResponse': self.saml_response}
 
         while not self.saml_response:
             await asyncio.sleep(self._SLEEP_TIMEOUT)

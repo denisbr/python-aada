@@ -4,4 +4,4 @@ botocore
 boto3
 websockets==4.0.1
 pyee==5.0.0
-git+https://github.com/piontas/pyppeteer.git
+pyppeteer=0.0.13
